@@ -1,0 +1,17 @@
+{% extends 'main/base.html'%}
+{% block content %}
+<div class="main">
+    <h1>{{ title }}</h1>
+<div class="form-container">
+    <form method="post" action="{% url 'register' %}">
+    {% csrf_token %}
+
+    {% for f in form %}
+        <p><label class="form-label" id="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}</p>
+        <div class="form-error">{{ f.errors }}</div>
+    {% endfor %}
+    <button type="submit" class="login-button">Регистрация</button>
+    </form>
+</div>
+</div>
+{% endblock %}

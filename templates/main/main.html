@@ -1,0 +1,23 @@
+{% extends 'main/base.html'%}
+{% load main_tags %}
+{% block content %}
+<div class="playlist">
+    <div class="playlist-listbox">
+    {% show_playlists %}
+    </div>
+<div class="playlist-body">
+<ul>
+ {% for s in songs %}
+     <li>
+     <h2>{{ s.name }}</h2>
+     <p>{{ s.artist.name }}</p>
+     <img class="song_cover" src="{{ s.icon.url }}" height="100px" width="100px" alt ="">
+     <audio controls preload="none">
+          <source src="{{ s.link.url }}" type="audio/mp3">
+          </audio>
+     </li>
+{% endfor %}
+</ul>
+        </div>
+    </div>
+{% endblock %}

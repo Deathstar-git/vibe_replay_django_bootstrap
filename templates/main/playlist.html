@@ -1,0 +1,49 @@
+{% extends 'main/base.html'%}
+{% load main_tags %}
+{% block content %}
+<div class="main">
+<div id="bg-artwork"></div>
+<div class="main-content">
+{% load main_tags %}
+<div class="playlist-container">
+     <h1>Плейлисты</h1>
+    <div class="playlist-listbox" id="playlist_list">
+    {% show_playlists curr_id=pl_id %}
+    </div>
+</div>
+<div class="playlist-container">
+<h1>Песни</h1>
+<div class="playlist-body" id="songs_list">
+ {% for s in songs %}
+     <div class="song-body">
+     <div class="song_body-img"><img class="song_cover" src="{{ s.icon.url }}" alt =""></div>
+        <div class="song-body-title">
+            <div class="song-body-item" style="font-weight: bold">{{ s.name }}</div>
+            <div class="song-body-item">{% get_artist_by_song_name song_id=s.pk %}</div>
+        </div>
+      <div class="song-button" id={{ s.pk }}>
+         <i class="fas fa-play"></i>
+     </div>
+         {% if request.user.is_authenticated %}
+    <div class="song-download">
+         <a href="{% url 'download' song_id=s.pk %}" download>
+          <i class="fas fa-download"></i>
+         </a>
+    </div>
+    <div class="song-like">
+         {% if s in request.user.account.my_music.all %}
+         <a class="song-add-link" style="color:red" href="{% url 'add_to_my' song_id=s.pk %}">
+            {% else %}
+            <a class="song-add-link" href="{% url 'add_to_my' song_id=s.pk %}">
+         {% endif %}
+          <i class="fas fa-heart"></i>
+         </a>
+    </div>
+     {% endif %}
+     </div>
+{% endfor %}
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

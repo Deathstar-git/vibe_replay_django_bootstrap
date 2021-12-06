@@ -1,0 +1,16 @@
+{% load main_tags %}
+<div class="search-answer">
+    {% for a in answer %}
+           <div class="song-body">
+     <div class="song_body-img">
+         <img class="song_cover" style="width:25px;height:25px" src="{{ a.icon.url }}"  alt ="">
+     </div>
+        <div class="song-body-title">
+            <div class="song-body-item" style="font-weight: bold; font-size:12px">{{ a.name }}</div>
+            <div class="song-body-item" style="font-size:12px">
+                {% get_artist_by_song_name song_id=a.pk %}
+            </div>
+        </div>
+     </div>
+    {% endfor %}
+</div>

@@ -1,0 +1,72 @@
+<script type="text/javascript">
+$(document).ready(function() { // ID откуда кливаем
+    $('html, body').animate({
+        scrollLeft: $('.playlist-list-item-active').offset().left  // класс объекта к которому приезжаем
+    }, 1000); // Скорость прокрутки
+});
+       /* $(function(){
+            $(document).on('click', '.pl-a', function(){
+                    let toLoad = $(this).attr('href')+' .playlist';
+                    let load = $('#load')
+                    {#$('.playlist').hide('slow',loadContent);#}
+                    loadContent()
+                    load.remove();
+                    $('.playlist-body').append('<span id="load">LOADING...</span>');
+                    load.fadeIn('normal');
+                    function loadContent() {
+                     $('.playlist').load(toLoad,'', showNewContent())
+                    }
+                    function showNewContent() {
+                     $('.playlist').show('normal',hideLoader());
+                    }
+                    function hideLoader() {
+                     load.fadeOut('normal');
+                     }
+                     return false;
+            });
+        }); */
+
+</script>
+{% for p in pl %}
+    {% if p.pk == curr_id %}
+        <div class="playlist-list-item-active">
+            <a class="pl-a" href="{{  p.get_absolute_url }}">{% if p.cover %}
+            <img class="pl_cover" src="{{ p.cover.url }}" alt="" >
+                <svg width="80" height="80" fill="#ffffff">
+	<rect x = "5%" rx="5%" height="0" width = "10%" stroke="black">
+		<animate attributeName="height" values="20%; 70%; 20%" dur="0.8s" begin="indefinite" ></animate>
+		<animate attributeName="y" values="40%; 15%; 40%" dur="0.8s" begin="indefinite"></animate>
+	</rect>
+	<rect x = "25%" rx="5%" height="0" width = "10%" stroke="black">
+		<animate attributeName="height" values="20%; 70%; 20%" dur="0.8s" begin="indefinite"></animate>
+		<animate attributeName="y" values="40%; 15%; 40%" dur="0.8s" begin="indefinite" ></animate>
+	</rect>
+	<rect x = "45%" rx="5%" height="0" width = "10%" stroke="black">
+		<animate attributeName="height" values="20%; 70%; 20%" dur="0.8s" begin="indefinite" ></animate>
+		<animate attributeName="y" values="40%; 15%; 40%" dur="0.8s" begin="indefinite" ></animate>
+	</rect>
+	<rect x = "65%" rx="5%" height="0" width = "10%" stroke="black">
+		<animate attributeName="height" values="20%; 70%; 20%" dur="0.8s" begin="indefinite" ></animate>
+		<animate attributeName="y" values="40%; 15%; 40%" dur="0.8s" begin="indefinite" ></animate>
+	</rect>
+	<rect x = "85%" rx="5%" height="0" width = "10%" stroke="black">
+		<animate attributeName="height" values="20%; 70%; 20%" dur="0.8s" begin="indefinite" ></animate>
+		<animate attributeName="y" values="40%; 15%; 40%" dur="0.8s" begin="indefinite" ></animate>
+	</rect>
+</svg>
+            {% endif %}</a>
+    </div>
+    {% else %}
+    <div class="playlist-list-item">
+
+            <a class="pl-a" href="{{  p.get_absolute_url }}">
+                {% if p.cover %}
+            <img class="pl_cover" src="{{ p.cover.url }}" alt="" >
+                <br>
+            {% endif %}
+            </a>
+    </div>
+    {% endif %}
+        {% endfor %}
+
+

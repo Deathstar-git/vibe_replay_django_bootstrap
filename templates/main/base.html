@@ -1,0 +1,765 @@
+{% load static %}
+{% load main_tags %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" type="text/css" href="/media/css/styles.css">
+    <link type="text/css" href="{% static 'main/css/styles.css' %}" rel="stylesheet"/>
+    <link type="text/css" href="{% static 'main/css/mobile_styles.css' %}" rel="stylesheet" media="(max-device-width: 720px)"/>
+    <link rel="shorcut icon" href="{% static 'main/img/main.ico' %}" type="images/x-icon"/>
+    <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.3.1/css/solid.css'>
+    <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.3.1/css/fontawesome.css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+</head>
+<body>
+{% block mainmenu %}
+
+<header class="header-outer">
+<div class="header-inner">
+    <div class="logo_div"><a class="a-main" href="{% url 'main' %} "><div class="logo"></div></a></div>
+    <div class="search_div">
+        <label for="q"></label>
+        <input type="search" id="q" class="input-search" placeholder="Название песни..." autocomplete="off">
+        <div id="results"></div>
+    </div>
+    {% for m in menu %}
+        {% if m.title == "Исполнители" %}
+            <div class="menu-div"><a class="a-{{ m.url_name }}" href="{% url m.url_name 1 %}">{{ m.title }}</a></div>
+            {% else %}
+                <div class="menu-div"><a class="a-{{ m.url_name }}" href="{% url m.url_name %}">{{ m.title }}</a></div>
+        {% endif %}
+
+    {% endfor %}
+  </div>
+    </header>
+{% endblock mainmenu %}
+<script type="text/javascript">
+
+       $(document).on('keyup', '#q', function () { //Запрос отправляется каждый раз
+           //когда вы вводим символ(ну т.е. каждое нажатие клавиши)
+            let q = $(this).val(); //вытаскиваем то что ввели
+             let url = "{% url 'search' %}" // указываем url для поиска
+            if (q !== '') { //если введенное не пустое
+                $.ajax({  //делаем аякс запрос
+                    url: url,
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}', //ну про это должны знать хехе
+                        query: q //и передаем данные для поиска как переменную query
+                    },
+                    type: 'GET', //отправляем данные соответсвенно тип GET
+                    success: function (data) { //Если всё прошло успешно
+                        $("#results").html(data); //вставляем в div с id=results
+                        //те данные,которые получил аякс т.е ту страничку test.html
+                        //которую вернула вьюха
+                    },
+                });
+            }
+        });
+       $(document).on('focusout', '#q', function () {
+            $(".search-answer").remove();
+            //если юзер убирает фокус с поисковика,он скрывается
+        });
+</script>
+{% block content %}
+{% endblock %}
+{% block player %}
+<div id="app-cover">
+
+ <div id="player">
+     {% get_songs_info pl_id as songs_info %}
+        <div id="player-track">
+            <div id="track-info">
+                 <div id="artist-name"></div>
+                <div id="track-name"></div>
+            </div>
+          <div id="track-time">
+            <div id="current-time"></div>
+            <div id="track-length"></div>
+          </div>
+          <div id="s-area">
+            <div id="ins-time"></div>
+            <div id="s-hover"></div>
+            <div id="seek-bar"></div>
+          </div>
+        </div>
+        <div id="player-content">
+          <div id="album-art">
+            <div id="buffer-box">Обработка..</div>
+          </div>
+          <div id="player-controls">
+            <div class="control">
+              <div class="button" id="play-previous">
+                <i class="fas fa-backward"></i>
+              </div>
+            </div>
+            <div class="control">
+              <div class="button" id="play-pause-button">
+                <i class="fas fa-play"></i>
+              </div>
+            </div>
+            <div class="control">
+              <div class="button" id="play-next">
+                <i class="fas fa-forward"></i>
+              </div>
+            </div>
+              <div class="control">
+              <div class="button" id="play-loop-button">
+                <i class="fas fa-redo"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" id="player-script">
+
+ $(function()
+{
+    var playerTrack = $("#player-track"), bgArtwork = $('#bg-artwork'), bgArtworkUrl, artistName = $('#artist-name'),
+        trackName = $('#track-name'), albumArt = $('#album-art'),  sArea = $('#s-area'), seekBar = $('#seek-bar'),
+        trackTime = $('#track-time'), insTime = $('#ins-time'), sHover = $('#s-hover'),
+        playPauseButton = $("#play-pause-button"), playLoopButton = $("#play-loop-button"), i = playPauseButton.find('i'), tProgress = $('#current-time'),
+        tTime = $('#track-length'), seekT, seekLoc, seekBarPos, cM, ctMinutes, ctSeconds, curMinutes, curSeconds,
+        durMinutes, durSeconds, playProgress, bTime, nTime = 0, buffInterval = null, tFlag = false,
+        trackNames ={{ songs_info.songs|safe }}, artistNames ={{ songs_info.artists|safe }}, songArtworks = {{ songs_info.songs_id|safe }},
+        bgArtworkUrls = {{ songs_info.cover_urls|safe }}, trackUrl ={{ songs_info.songs_urls|safe }},
+        playPreviousTrackButton = $('#play-previous'), playNextTrackButton = $('#play-next'), currIndex = -1;
+            $(document).on('click', '.pl-a', function(){
+                    let playlist = $(this).attr('href')+' .main > *';
+                    let header = $(this).attr('href')+' header > *';
+                    $('.playlist-body').append('<div class="image-container" id="load">\n' +
+                        '<p class="image-holder">\n' +
+                        '<img src="{% static 'main/img/ajax-loader.gif' %}"/>\n' +
+                        '</p>\n' +
+                        '</div>');
+                    $('#load').fadeIn('normal');
+                    loadContent();
+                    function showNewContent() {
+                     $('.playlist').show('normal',hideLoader());
+                    }
+                    function hideLoader() {
+                     $('#load').fadeOut('normal');
+                     }
+                    function loadContent() {
+                     $('.main').load(playlist, '', function() {
+                         $('#bg-artwork').css({'background-image':'url('+bgArtworkUrls[currIndex]+')'});
+                         showNewContent();
+                     })
+                     $('header').load(header)
+
+                    }
+
+                     return false;
+            });
+            $(document).on('click', '#айди элемента', function(){
+                    let playlist = $(this).attr('href')+' .main > *';
+                    let header = $(this).attr('href')+' header > *';
+                    let url = "{% url 'get_playlist_data' %}"
+                    loadContent();
+                    function loadContent() {
+                     $('.main').load(playlist, '', function() {
+                           $.ajax({
+                                url: url,
+                                type: 'GET',
+                                dataType: 'json',
+                                success: function (data) {
+                                    trackNames = data['songs'];
+                                    artistNames = data['artists'];
+                                    songArtworks = data['songs_id'];
+                                    bgArtworkUrls = data['cover_urls'];
+                                    trackUrl = data['songs_urls'];
+                                        },
+                                    });
+                     })
+                     $('header').load(header)
+
+                    }
+                     return false;
+            });
+            $(document).on('click', '.a-about', function(){
+                    let playlist = $(this).attr('href')+' .main > *';
+                    let header = $(this).attr('href')+' header > *';
+                    let url = "{% url 'get_playlist_data' %}"
+                    loadContent();
+                    function loadContent() {
+                     $('.main').load(playlist, '', function() {
+                           $.ajax({
+                                url: url,
+                                type: 'GET',
+                                dataType: 'json',
+                                success: function (data) {
+                                    trackNames = data['songs'];
+                                    artistNames = data['artists'];
+                                    songArtworks = data['songs_id'];
+                                    bgArtworkUrls = data['cover_urls'];
+                                    trackUrl = data['songs_urls'];
+                                        },
+                                    });
+                     })
+                     $('header').load(header)
+
+                    }
+                     return false;
+            });
+            $(document).on('click', '.a-categories', function(){
+                    let playlist = $(this).attr('href')+' .main > *';
+                    let header = $(this).attr('href')+' header > *';
+                    let url = "{% url 'get_playlist_data' %}"
+                    loadContent();
+                    function loadContent() {
+                     $('.main').load(playlist, '', function() {
+                           $.ajax({
+                                url: url,
+                                type: 'GET',
+                                dataType: 'json',
+                                success: function (data) {
+                                    trackNames = data['songs'];
+                                    artistNames = data['artists'];
+                                    songArtworks = data['songs_id'];
+                                    bgArtworkUrls = data['cover_urls'];
+                                    trackUrl = data['songs_urls'];
+                                        },
+                                    });
+                     })
+                     $('header').load(header)
+
+                    }
+                     return false;
+            });
+            $(document).on('click', '.a-logout', function(){
+                    let playlist = $(this).attr('href')+' .main > *';
+                    let header = $(this).attr('href')+' header > *';
+                    let url = "{% url 'get_playlist_data' %}"
+                    loadContent();
+                    function loadContent() {
+                     $('.main').load(playlist, '', function() {
+                           $.ajax({
+                                url: url,
+                                type: 'GET',
+                                dataType: 'json',
+                                success: function (data) {
+                                    trackNames = data['songs'];
+                                    artistNames = data['artists'];
+                                    songArtworks = data['songs_id'];
+                                    bgArtworkUrls = data['cover_urls'];
+                                    trackUrl = data['songs_urls'];
+                                        },
+                                    });
+                     })
+                     $('header').load(header)
+
+                    }
+                     return false;
+            });
+            $(document).on('click', '.a-register', function(){
+                    let playlist = $(this).attr('href')+' .main > *';
+                    let header = $(this).attr('href')+' header > *';
+                    let url = "{% url 'get_playlist_data' %}"
+                    loadContent();
+                    function loadContent() {
+                     $('.main').load(playlist, '', function() {
+                           $.ajax({
+                                url: url,
+                                type: 'GET',
+                                dataType: 'json',
+                                success: function (data) {
+                                    trackNames = data['songs'];
+                                    artistNames = data['artists'];
+                                    songArtworks = data['songs_id'];
+                                    bgArtworkUrls = data['cover_urls'];
+                                    trackUrl = data['songs_urls'];
+                                        },
+                                    });
+                     })
+                     $('header').load(header)
+
+                    }
+                     return false;
+            });
+            $(document).on('click', '.a-artists', function(){
+                    let playlist = $(this).attr('href')+' .main > *';
+                    let header = $(this).attr('href')+' header > *';
+                    let url = "{% url 'get_playlist_data' %}"
+                    loadContent();
+                    function loadContent() {
+                     $('.main').load(playlist, '', function() {
+                           $.ajax({
+                                url: url,
+                                type: 'GET',
+                                dataType: 'json',
+                                success: function (data) {
+                                    trackNames = data['songs'];
+                                    artistNames = data['artists'];
+                                    songArtworks = data['songs_id'];
+                                    bgArtworkUrls = data['cover_urls'];
+                                    trackUrl = data['songs_urls'];
+                                        },
+                                    });
+                     })
+                     $('header').load(header)
+
+                    }
+                     return false;
+            });
+            $(document).on('click', '.a-login', function(){
+                    let login = $(this).attr('href')+' .main > *';
+                    let header = $(this).attr('href')+' header > *';
+                    loadContent();
+                    function loadContent() {
+                     $('.main').load(login)
+                     $('header').load(header)
+
+                    }
+                     return false;
+            });
+            /*$(document).on('click', '.login-button', function(){
+                    let url = "{% url 'login' %}"
+                           $.ajax({
+                                url: url,
+                                type: 'POST',
+                               data: {
+                                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                                    username: $('[name="text"]').val(),
+                                    password: $('[name="password"]').val()
+                                },
+                                dataType: 'json',
+                                success: function (data) {
+                                   console.log(data)
+                                        },
+                                    });
+                     return false;
+            }); */
+            $(document).on('click', '.a-my', function(){
+                    let playlist = $(this).attr('href')+' .main > *';
+                    let header = $(this).attr('href')+' header > *';
+                    let url = "{% url 'get_mymusic_data' %}"
+                    loadContent();
+                    function loadContent() {
+                     $('.main').load(playlist, '', function() {
+                           $.ajax({
+                                url: url,
+                                type: 'GET',
+                                dataType: 'json',
+                                success: function (data) {
+                                    trackNames = data['songs'];
+                                    artistNames = data['artists'];
+                                    songArtworks = data['songs_id'];
+                                    bgArtworkUrls = data['cover_urls'];
+                                    trackUrl = data['songs_urls'];
+                                        },
+                                    });
+                     })
+                     $('header').load(header)
+
+                    }
+                     return false;
+            });
+            $(document).on('click', '.song-add-link', function(){
+                    if ($(this).attr('style') === 'color:red') {
+                        {#$(this).attr('style', 'color:white;')#}
+                        return false;
+                    }
+                   /* let login = $(this).attr('href')+' .main > *';
+                    let header = $(this).attr('href')+' header > *';
+                    loadContent();
+                    function loadContent() {
+                     $('.main').load(login)
+                     $('header').load(header)
+
+                    }
+                     return false; */
+            });
+
+
+
+    function playPause()
+    {
+        setTimeout(function()
+        {
+            if(audio.paused)
+            {
+                go_pl_anim(0)
+                playerTrack.addClass('active');
+                albumArt.addClass('active');
+                checkBuffering();
+                i.attr('class','fas fa-pause');
+                audio.play();
+            }
+            else
+            {
+                go_pl_anim(1)
+                playerTrack.removeClass('active');
+                albumArt.removeClass('active');
+                clearInterval(buffInterval);
+                albumArt.removeClass('buffering');
+                 if (typeof prev_button !== "undefined") {
+                     prev_button.attr('class', 'fas fa-play')
+                }
+                i.attr('class','fas fa-play');
+                audio.pause();
+            }
+        },300);
+    }
+
+
+	function showHover(event)
+	{
+		seekBarPos = sArea.offset();
+		seekT = event.clientX - seekBarPos.left;
+		seekLoc = audio.duration * (seekT / sArea.outerWidth());
+
+		sHover.width(seekT);
+
+		cM = seekLoc / 60;
+
+		ctMinutes = Math.floor(cM);
+		ctSeconds = Math.floor(seekLoc - ctMinutes * 60);
+
+		if( (ctMinutes < 0) || (ctSeconds < 0) )
+			return;
+
+        if( (ctMinutes < 0) || (ctSeconds < 0) )
+			return;
+
+		if(ctMinutes < 10)
+			ctMinutes = '0'+ctMinutes;
+		if(ctSeconds < 10)
+			ctSeconds = '0'+ctSeconds;
+
+        if( isNaN(ctMinutes) || isNaN(ctSeconds) )
+            insTime.text('--:--');
+        else
+		    insTime.text(ctMinutes+':'+ctSeconds);
+
+		insTime.css({'left':seekT,'margin-left':'-21px'}).fadeIn(0);
+
+	}
+
+    function hideHover() {# Возвращение таймера песни к нулю #}
+	{
+        sHover.width(0);
+        insTime.text('00:00').css({'left':'0px','margin-left':'0px'}).fadeOut(0);
+    }
+
+    function playFromClickedPos()  {# Проигрывание песни с выбранной кликом позиции #}
+    {
+        audio.currentTime = seekLoc;
+		seekBar.width(seekT);
+		hideHover();
+    }
+
+    function updateCurrTime()
+	{
+        nTime = new Date();
+        nTime = nTime.getTime();
+
+        if( !tFlag )
+        {
+            tFlag = true;
+            trackTime.addClass('active');
+        }
+
+		curMinutes = Math.floor(audio.currentTime / 60);
+		curSeconds = Math.floor(audio.currentTime - curMinutes * 60);
+
+		durMinutes = Math.floor(audio.duration / 60);
+		durSeconds = Math.floor(audio.duration - durMinutes * 60);
+
+		playProgress = (audio.currentTime / audio.duration) * 100;
+
+		if(curMinutes < 10)
+			curMinutes = '0'+curMinutes;
+		if(curSeconds < 10)
+			curSeconds = '0'+curSeconds;
+
+		if(durMinutes < 10)
+			durMinutes = '0'+durMinutes;
+		if(durSeconds < 10)
+			durSeconds = '0'+durSeconds;
+
+        if( isNaN(curMinutes) || isNaN(curSeconds) )
+            tProgress.text('00:00');
+        else
+		    tProgress.text(curMinutes+':'+curSeconds);
+
+        if( isNaN(durMinutes) || isNaN(durSeconds) )
+            tTime.text('00:00');
+        else
+		    tTime.text(durMinutes+':'+durSeconds);
+
+        if( isNaN(curMinutes) || isNaN(curSeconds) || isNaN(durMinutes) || isNaN(durSeconds) )
+            trackTime.removeClass('active');
+        else
+            trackTime.addClass('active');
+
+
+		seekBar.width(playProgress+'%');
+
+		if( playProgress === 100 )
+		{
+		    selectTrack(1)
+			{#i.attr('class','fa fa-play');#}
+			{#seekBar.width(0);#}
+            {#tProgress.text('00:00');#}
+            {#albumArt.removeClass('buffering').removeClass('active');#}
+            {#clearInterval(buffInterval);#}
+		}
+    }
+
+    function checkBuffering()
+    {
+        clearInterval(buffInterval);
+        buffInterval = setInterval(function()
+        {
+            if( (nTime === 0) || (bTime - nTime) > 1000  )
+                albumArt.addClass('buffering');
+            else
+                albumArt.removeClass('buffering');
+
+            bTime = new Date();
+            bTime = bTime.getTime();
+
+        },100);
+    }
+
+    function selectTrack(flag)  {# Переключение песни по очередии плеера #}
+    {
+        if( flag === 0 || flag === 1 )
+            ++currIndex;
+        else
+            --currIndex;
+
+        if( (currIndex > -1) && (currIndex <= songArtworks.length) )
+        {
+            if( flag === 0 )
+                i.attr('class','fa fa-play');
+            else
+            {
+                albumArt.removeClass('buffering');
+                i.attr('class','fa fa-pause');
+            }
+            if (currIndex === songArtworks.length) {
+                currIndex = songArtworks.indexOf(songArtworks[0])
+            }
+            seekBar.width(0);
+            trackTime.removeClass('active');
+            tProgress.text('00:00');
+            tTime.text('00:00');
+
+            let currArtist = artistNames[currIndex];
+            let currTrackName = trackNames[currIndex];
+            let currArtwork = songArtworks[currIndex];
+            audio.src = trackUrl[currIndex];
+
+            nTime = 0;
+            bTime = new Date();
+            bTime = bTime.getTime();
+
+            if(flag !== 0)
+            {
+                audio.play();
+                playerTrack.addClass('active');
+                albumArt.addClass('active');
+                clearInterval(buffInterval);
+                checkBuffering();
+            }
+
+            artistName.text(currArtist);
+            trackName.text(currTrackName);
+            $(currArtwork).addClass('active');
+            bgArtworkUrl = $(currArtwork).attr('src');
+            albumArt.html("<img src='" + bgArtworkUrls[currIndex] + "' class='active' alt= ''>")
+            bgArtwork.css({'background-image':'url('+bgArtworkUrls[currIndex]+')'});
+        }
+        else
+        {
+            if( flag === 0 || flag === 1 )
+                --currIndex;
+            else
+                ++currIndex;
+        }
+    }
+    function selectCurrTrack(curr_id) {# Переключение песни по очередии списка песен #}
+    {
+        var songs_nums = new Map();
+        let anim_pl = $('animate');
+        anim_pl.attr('repeatCount', 'indefinite')
+        for (let i = 0; i < songArtworks.length; i++) {
+                 songs_nums.set(songArtworks[i], i);
+            }
+
+        currIndex = songs_nums.get(curr_id);
+
+         setTimeout(function()
+        {
+            let song_i = $(document).find('#' + curr_id).find('i');
+            if(audio.paused || song_i.attr('class') === 'fas fa-play')
+            {
+                go_pl_anim(0)
+                if (typeof prev_button !== "undefined") {
+                     prev_button.attr('class', 'fas fa-play')
+                }
+                prev_button = song_i;
+                playerTrack.addClass('active');
+                albumArt.addClass('active');
+                checkBuffering();
+                i.attr('class','fas fa-pause');
+                song_i.attr('class','fas fa-pause');
+                if( (currIndex > -1) && (currIndex < songArtworks.length) ) {
+                    seekBar.width(0);
+                    trackTime.removeClass('active');
+                    tProgress.text('00:00');
+                    tTime.text('00:00');
+
+                    let currArtist = artistNames[currIndex];
+                    let currTrackName = trackNames[currIndex];
+                    let currArtwork = songArtworks[currIndex];
+
+                    audio.src = trackUrl[currIndex];
+
+                    nTime = 0;
+                    bTime = new Date();
+                    bTime = bTime.getTime();
+
+                    audio.play();
+                    playerTrack.addClass('active');
+                    albumArt.addClass('active');
+                    clearInterval(buffInterval);
+                    checkBuffering();
+
+                    artistName.text(currArtist);
+                    trackName.text(currTrackName);
+                    $(currArtwork).addClass('active');
+                    bgArtworkUrl = $(currArtwork).attr('src');
+                    albumArt.html("<img src='" + bgArtworkUrls[currIndex] + "' class='active' alt= ''>")
+                    $('#bg-artwork').css({'background-image':'url('+bgArtworkUrls[currIndex]+')'});
+        }
+            }
+            else
+            {
+                go_pl_anim(1)
+                prev_button.attr('class','fas fa-play');
+                playerTrack.removeClass('active');
+                albumArt.removeClass('active');
+                clearInterval(buffInterval);
+                albumArt.removeClass('buffering');
+                i.attr('class','fas fa-play');
+                song_i.attr('class','fas fa-play');
+                audio.pause();
+            }
+        },300);
+    }
+
+    function loopTrack() {  {#  Зацикливание песни #}
+        if (audio.loop === true) {
+            audio.loop = false;
+            playLoopButton.removeClass('active');
+        }
+        else {
+            audio.loop = true
+            playLoopButton.addClass('active');
+        }
+
+    }
+
+    function initPlayer()  {# Создание плеера и всех кнопок #}
+	{
+        audio = new Audio();
+		selectTrack(0);
+
+		audio.loop = false;
+
+        $('#bg-artwork').css({'background-image':'url('+bgArtworkUrls[currIndex]+')'});
+
+		playPauseButton.on('click',playPause);
+		$(document).on('click', '.song-button', function(){
+		    let clickId = $(this).attr('id');
+		    let url = "{% url 'get_playlist_data' %}"
+           $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    trackNames = data['songs'];
+                    artistNames = data['artists'];
+                    songArtworks = data['songs_id'];
+                    bgArtworkUrls = data['cover_urls'];
+                    trackUrl = data['songs_urls'];
+                    selectCurrTrack(clickId);
+                        },
+                    });
+
+		})
+        $(document).on('click', '.song-button-my', function(){
+		    let clickId = $(this).attr('id');
+		    let url = "{% url 'get_mymusic_data' %}"
+           $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    trackNames = data['songs'];
+                    artistNames = data['artists'];
+                    songArtworks = data['songs_id'];
+                    bgArtworkUrls = data['cover_urls'];
+                    trackUrl = data['songs_urls'];
+                    selectCurrTrack(clickId);
+                        },
+                    });
+
+		})
+
+        playLoopButton.on('click', loopTrack);
+
+		sArea.mousemove(function(event){ showHover(event); });
+
+        sArea.mouseout(hideHover);
+
+        sArea.on('click',playFromClickedPos);
+
+        $(audio).on('timeupdate',updateCurrTime);
+
+        playPreviousTrackButton.on('click',function(){ selectTrack(-1);} );
+        playNextTrackButton.on('click',function(){ selectTrack(1);});
+	}
+
+	initPlayer();
+
+       function go_pl_anim (flag) {  {# Анимация у обложки плейлиста #}
+        var begin_odd = 0;
+        var begin_even = 0;
+        $("animate:odd").each( function() {
+            if (flag === 0) {
+                $(this).attr('values', "40%; 15%; 40%");
+                $(this).attr('repeatCount', 'indefinite');
+                $(this).attr('begin', begin_odd+"s");
+                begin_odd = begin_odd + 0.15;
+            }
+            else {
+                 $(this).attr('values', '0%');
+            }
+
+            }
+        );
+        $("animate:even").each( function() {
+            if (flag === 0) {
+                $(this).attr('values', "20%; 70%; 20%");
+                $(this).attr('repeatCount', 'indefinite');
+                $(this).attr('begin', begin_even+"s");
+                begin_even = begin_even + 0.15;
+            }
+            else {
+                $(this).attr('values', '0%');
+            }
+            }
+        );
+    }
+});
+  </script>
+{% endblock %}
+</body>
+</html>

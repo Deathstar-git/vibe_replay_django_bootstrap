@@ -1,0 +1,16 @@
+{% extends 'main/base.html'%}
+{% block content %}
+<div class="main">
+   <h1>{{ title }}</h1>
+    <div class="artists-container">
+    {% for g in genres %}
+        <div class="artists-body">
+            <div class="cat-body">
+                 {{ g.title }}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+</div>
+{% endblock %}

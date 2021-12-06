@@ -1,0 +1,40 @@
+{% extends 'main/base.html'%}
+{% block content %}
+{% load main_tags %}
+<div class="main">
+    {% if request.user.is_authenticated %}
+    <h1>{{ title }} {{ request.user.username }} | <a class="a-logout" href="{% url 'logout' %}" style="color: black">Выйти</a></h1>
+        {% else %}
+        <h1>{{ title }}</h1>
+    {% endif %}
+    <div class="account-info">
+        <h1>Моя музыка</h1>
+        {% if user.account.my_music %}
+        {% for m in user.account.my_music.all %}
+            <div class="song-body">
+     <div class="song_body-img"><img class="song_cover" src="{{ m.icon.url }}" alt =""></div>
+        <div class="song-body-title">
+            <div class="song-body-item" style="font-weight: bold">{{ m.name }}</div>
+            <div class="song-body-item">{% get_artist_by_song_name song_id=m.pk %}</div>
+        </div>
+      <div class="song-button-my" id={{ m.pk }}>
+         <i class="fas fa-play"></i>
+     </div>
+    <div class="song-download">
+         <a href="{% url 'download' song_id=m.pk %}" download>
+          <i class="fas fa-download"></i>
+         </a>
+    </div>
+    <div class="song-like">
+         <a class="song-add-link" style="color:red" href="{% url 'add_to_my' song_id=m.pk %}">
+          <i class="fas fa-heart"></i>
+         </a>
+    </div>
+     </div>
+        {% endfor %}
+     {% else %}
+            <p>Список музыки пуст</p>
+    {% endif %}
+    </div>
+</div>
+{% endblock %}

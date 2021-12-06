@@ -1,0 +1,90 @@
+@media (max-device-width: 720px){
+    :root {
+  --header-outer-height: 100px;
+  --header-inner-height: 80px;
+  --header-height-difference: calc(
+    var(--header-outer-height) - var(--header-inner-height)
+  );
+}
+    .playlist-listbox {
+    overflow: scroll;
+    }
+    .playlist-container h1
+    {
+        font-size:50px;
+    }
+    .input-search {
+        width:200px;
+        height:40px;
+        font-size:24px;
+    }
+
+    .song-body-item,
+    .song-button,
+    .song-button-my,
+    .song-download,
+    .song-like{
+        font-size:30px;
+        margin: 0 20px 0 20px;
+    }
+    .song_cover {
+        border-radius: 75px;
+        height: 125px;
+        width: 125px;
+    }
+    #track-name, #artist-name {
+        font-size: 18px;
+    }
+    #track-time {
+        height: 14px;
+    }
+    #current-time, #track-length {
+        font-size: 18px;
+    }
+    #player-track.active {
+        top: -70px;
+    }
+    .song-body-title {
+        width: 400px;
+        height: 40px;
+        font-size: 22px;
+    }
+    .pl_cover {
+    border-radius: 10px;
+	width:240px;
+	height:240px;
+    }
+    .menu-div {
+        font-size: 26px;
+    }
+
+    #app-cover {
+    top: 90%;
+    height: 160px;
+    }
+    .button {
+        width: auto;
+        height: auto;
+    }
+    .control {
+    width: 25%;
+    float: left;
+    padding: 30px 0;
+}
+    .control div i {
+        font-size: 70px;
+    }
+    #album-art {
+        width: 190px;
+        height: 190px;
+        margin-left: 20px;
+    }
+    #player-controls {
+        margin: 0 5px 0 275px;
+    }
+    svg {
+    width: 120px;
+    height: 120px;
+    right: 70px;
+}
+}
