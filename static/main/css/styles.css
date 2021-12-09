@@ -120,7 +120,7 @@ a:link {
 	margin-right:20px;
 	margin-left:20px;
 	display: flex;
-	background: rgba(255, 255, 255, 0.5);
+	background: rgba(255, 255, 255, 0.1);
 }
 .playlist-list-item {
     -webkit-box-sizing: border-box;
@@ -150,7 +150,7 @@ a:link {
 	position:relative;
 	display:block;
 	border-radius: 0 0 10px 10px;
-	background: rgba(255, 255, 255, 0.5);
+	background: rgba(255, 255, 255, 0.3);
 	margin: 0 20px 20px 20px;
 	padding-bottom: 100px;
 	padding-top: 5px;
@@ -267,7 +267,7 @@ div.image-container {
 .playlist-container h1{
 	color: #ffffff;
 	-webkit-text-stroke: 1px gray;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
     position: relative;
     border-radius: 10px 10px 0 0;
     margin: 20px 20px 0 20px;
