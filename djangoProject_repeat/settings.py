@@ -154,3 +154,5 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 TEMPLATE_DIRS = [
     os.path.join(BASE_DIR, 'templates')
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

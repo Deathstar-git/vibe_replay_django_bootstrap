@@ -20,9 +20,9 @@ class RegisterUserForm(UserCreationForm):
 
 class LoginUserForm(AuthenticationForm):
     username = CharField(label='Логин:',
-                         widget=TextInput(attrs={'class': 'form-input', 'placeholder': 'Придумайте логин'}))
+                         widget=TextInput(attrs={'class': 'form-input', 'placeholder': 'Введите логин'}))
     password = CharField(label='Пароль:',
-                         widget=PasswordInput(attrs={'class': 'form-input', 'placeholder': 'Придумайте пароль'}))
+                         widget=PasswordInput(attrs={'class': 'form-input', 'placeholder': 'Введите пароль'}))
 
     class Meta:
         model = User

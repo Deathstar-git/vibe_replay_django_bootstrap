@@ -89,25 +89,6 @@ def add_to_my(request, song_id):
     return redirect(request.META['HTTP_REFERER'])
 
 
-# def main(request):
-#     pl_id = 1
-#     # pl_id_player = 1
-#     # if request.method == 'GET':
-#     #     if 'pl_id_player' in request.COOKIES:
-#     #         pl_id_player = request.COOKIES['pl_id_player']
-#     songs = Song.objects.filter(playlist__pk=pl_id)
-#     context = {
-#         'title': 'Главная страница',
-#         'menu': menu,
-#         'songs': songs,
-#         'pl_id': pl_id,
-#         # 'pl_id_player': pl_id_player
-#     }
-#     response = render(request, 'main/testmain.html', context=context)
-#     # response.set_cookie('pl_id_player', pl_id_player)
-#     return response
-
-
 class PlaylistView(DataMixin, ListView):
     model = Song
     template_name = 'main/playlist.html'

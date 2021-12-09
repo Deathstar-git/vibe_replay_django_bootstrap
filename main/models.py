@@ -6,7 +6,7 @@ from PIL import Image
 
 class Artist(models.Model):  # Исполнитель
     name = models.CharField(max_length=255, null=False, verbose_name='Имя артиста')  # Заголовок
-    text = models.TextField(null=True, blank=True, verbose_name='Описание')  # Краткое описание
+    biography = models.TextField(null=True, blank=True, verbose_name='Описание')  # Краткое описание
     img = models.ImageField(null=True, verbose_name='Картинка артиста', upload_to='artists/')
     header_img = models.ImageField(null=True, verbose_name='Шапка артиста', upload_to='artists/headers/')
 
