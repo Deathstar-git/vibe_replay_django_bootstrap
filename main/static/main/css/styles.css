@@ -115,6 +115,12 @@ a:link {
 .pl-a:hover{
 	color:#ffffff;
 }
+.playlist-songs {
+	width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+	padding-bottom: 200px;
+}
 .playlist-listbox{
 	border-radius: 0 0 10px 10px;
 	margin-right:20px;
@@ -274,6 +280,18 @@ div.image-container {
     margin: 20px 20px 0 20px;
     border-bottom: 4px solid lightgrey;
     padding: 5px
+}
+.playlist-songs h1{
+	color: #ffffff;
+	-webkit-text-stroke: 1px gray;
+    background: rgba(255, 255, 255, 0.1);
+    position: relative;
+    border-radius: 10px 10px 0 0;
+    margin: 20px 20px 0 20px;
+    border-bottom: 4px solid lightgrey;
+    padding: 5px;
+	display: flex;
+	justify-content: center
 }
 .search-answer {
 	position: absolute;
