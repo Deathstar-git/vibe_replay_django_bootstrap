@@ -2,10 +2,11 @@ from django.core.handlers.wsgi import WSGIRequest
 
 from main.models import Song
 
-menu = [{'title': "О проекте", 'url_name': 'about'},
+menu = [
+        {'title': "О проекте", 'url_name': 'about'},
         {'title': "Жанры", 'url_name': 'categories'},
         {'title': "Исполнители", 'url_name': 'artists'},
-        {'title': "Мой Repeat", 'url_name': 'my'}]
+        {'title': "Мой Vibe", 'url_name': 'my'}]
 
 
 class DataMixin:

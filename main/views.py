@@ -6,10 +6,10 @@ from django.contrib.auth.views import LoginView
 from django.http import HttpResponseNotFound, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, FormView
 from werkzeug.exceptions import InternalServerError
 # from django.views.decorators.cache import cache_page
-from .forms import RegisterUserForm, LoginUserForm
+from .forms import RegisterUserForm, LoginUserForm, CommentForm
 from .models import Artist, Account, Genre
 from .utils import *
 
@@ -87,6 +87,20 @@ def add_to_my(request, song_id):
     song = Song.objects.get(pk=song_id)
     user.account.my_music.add(song)
     return redirect(request.META['HTTP_REFERER'])
+
+
+def add_to_my_artist(request, a_id):
+    user = User.objects.get(pk=request.user.pk)
+    artist = Artist.objects.get(pk=a_id)
+    user.account.my_artists.add(artist)
+    return redirect('artist', a_id=a_id)
+
+
+def del_to_my_artist(request, a_id):
+    user = User.objects.get(pk=request.user.pk)
+    artist = Artist.objects.get(pk=a_id)
+    user.account.my_artists.remove(artist)
+    return redirect('artist', a_id=a_id)
 
 
 class PlaylistView(DataMixin, ListView):
@@ -263,7 +277,7 @@ class AboutView(DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-def pageNotFound(request, exception):
+def page_not_found(request, exception):
     return HttpResponseNotFound('<h1>Всё фигня,давай по новой</h1>')
 
 
@@ -277,7 +291,7 @@ def pageNotFound(request, exception):
 #     return render(request, 'main/artists.html', context=context)
 
 
-class ArtistsView(ArtistDataMixin, ListView):
+class ArtistsView(DataMixin, ListView):
     model = Artist
     template_name = 'main/artists.html'
     context_object_name = 'artists'
@@ -288,7 +302,7 @@ class ArtistsView(ArtistDataMixin, ListView):
             if 'pl_id' in self.request.COOKIES:
                 pl_id = self.request.COOKIES['pl_id']
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title='Исполнители', pl_id=pl_id, a_id=self.kwargs['a_id'])
+        c_def = self.get_user_context(title='Исполнители', pl_id=pl_id)
         return dict(list(context.items()) + list(c_def.items()))
 
 
@@ -341,3 +355,73 @@ def download_song(request, song_id):
 #         'pl_id': pl_id
 #     }
 #     return render(request, 'main/login.html', context=context)
+
+
+class ArtistView(ArtistDataMixin, ListView):
+    model = Artist
+    template_name = 'main/artist.html'
+    context_object_name = 'artist'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        pl_id = 1
+        if self.request.method == 'GET':
+            if 'pl_id' in self.request.COOKIES:
+                pl_id = self.request.COOKIES['pl_id']
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(pl_id=pl_id, a_id=self.kwargs['a_id'])
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def get_queryset(self):
+        return Artist.objects.get(pk=self.kwargs['a_id'])
+
+
+# class CategoryView(DataMixin, ListView):
+#     model = Genre
+#     template_name = 'main/category.html'
+#     context_object_name = 'genre'
+#
+#     def get_context_data(self, *, object_list=None, **kwargs):
+#         pl_id = 1
+#         if self.request.method == 'GET':
+#             if 'pl_id' in self.request.COOKIES:
+#                 pl_id = self.request.COOKIES['pl_id']
+#         context = super().get_context_data(**kwargs)
+#         c_def = self.get_user_context(title='Жанры', pl_id=pl_id)
+#         return dict(list(context.items()) + list(c_def.items()))
+#
+#     def get_queryset(self):
+#         return Genre.objects.get(pk=self.kwargs['g_id'])
+
+
+class SongView(DataMixin, ListView, FormView):
+    model = Song
+    form_class = CommentForm
+    template_name = 'main/song.html'
+    context_object_name = 'song'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        pl_id = 1
+        if self.request.method == 'GET':
+            if 'pl_id' in self.request.COOKIES:
+                pl_id = self.request.COOKIES['pl_id']
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Песня', pl_id=pl_id)
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def get_queryset(self):
+        return Song.objects.get(pk=self.kwargs['s_id'])
+
+
+def send_comment(request, s_id):
+    if request.method == 'POST':
+        f = CommentForm(request.POST)
+        comment = f.save()
+        comment.song = Song.objects.get(pk=s_id)
+        comment.author = Account.objects.get(user__pk=request.user.pk)
+        f.save()
+    # user = User.objects.get(pk=request.user.pk)
+    # song = Song.objects.get(pk=s_id)
+    # comment_song = song.comments_songs.all()
+    # print(comment_song)
+    # text = ""
+    return redirect('song', s_id=s_id)

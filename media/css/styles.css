@@ -1,15 +1,15 @@
 
 body {
-    background-color:#ffe8ee;
+    background-color:#434750;
 }
 #app-cover
 {
 
     position: fixed;
     top: 89%;
-    right: 85%;
+    right: 1%;
     left: 0;
-    width: 100%;
+    width: 90%;
     height: 80px;
     margin: -4px auto;
 }
@@ -46,10 +46,12 @@ body {
     position: relative;
     height: 100%;
     z-index: 3;
+    top:27px;
 }
 
 #player-track
 {
+    display:flex;
     position: absolute;
     top: 0;
     right: 15px;
@@ -60,10 +62,12 @@ body {
     transition: 0.3s ease top;
     z-index: 1;
 }
-
+#track-place {
+    display:block;
+}
 #player-track.active
 {
-    top: -60px;
+    top: -15px;
 }
 
 #artist-name
@@ -75,6 +79,7 @@ body {
 }
 #track-info {
     display: flex;
+    margin-bottom:15px;
 }
 #track-name
 {
@@ -87,6 +92,7 @@ body {
 {
     height: 12px;
     margin-bottom: 3px;
+    width:500px;
 }
 
 #current-time
@@ -110,7 +116,7 @@ body {
 
 #track-time.active #current-time, #track-time.active #track-length
 {
-    color: #f86d92;
+    color: #444444;
     background-color: transparent;
 }
 
@@ -125,6 +131,7 @@ body {
 {
     background-color:#ffe8ee;
     cursor: pointer;
+    width: 500px;
 }
 
 #ins-time
@@ -162,7 +169,7 @@ body {
     bottom: 0;
     left: 0;
     width: 0;
-    background-color: #fd6d94;
+    background-color: #444444;
     transition: 0.2s ease width;
     z-index: 1;
 }
@@ -179,11 +186,11 @@ body {
 
 #album-art
 {
-    position: absolute;
+    position:absolute;
     top: -40px;
-    width: 115px;
-    height: 115px;
-    margin-left: 40px;
+    width: 100px;
+    height: 100px;
+    left:60px;
     -webkit-transform: rotateZ(0);
             transform: rotateZ(0);
     transition: 0.3s ease all;
@@ -194,7 +201,7 @@ body {
 
 #album-art.active
 {
-    top: -60px;
+    top: -40px;
     box-shadow: 0 0 0 4px #fff7f7, 0 30px 50px -15px #afb7c1;
 }
 
@@ -294,24 +301,23 @@ body {
 
 #player-controls
 {
-    width: 500px;
+    width: 50%;
     height: 100%;
-    margin: 0 5px 0 141px;
+    margin: 0 5px 0 118px;
     float: left;
     overflow: hidden;
 }
 .control
 {
-    width: 25%;
+    width: 20%;
     float: left;
     padding: 12px 0;
 }
 
 .button
 {
-    width: 26px;
-    height: 26px;
-    padding: 25px;
+    width: 22px;
+    height: 22px;
     background-color: #fff;
     border-radius: 6px;
     cursor: pointer;
@@ -331,29 +337,8 @@ body {
     transition: 0.2s ease all;
 }
 
-.button:hover
-{
-    background-color: #d6d6de;
-}
-
 .button:hover i
 {
-    color: #fff;
+    color: #444444;
 }
 
-#play-loop-button.active
-{
-    background-color: #fff;
-}
-#play-loop-button.active i
-{
-    color: #3b3d50;
-}
-#play-loop-button:hover
-{
-    background-color: #fff;
-}
-#play-loop-button:hover i
-{
-   color: #3b3d50;
-}

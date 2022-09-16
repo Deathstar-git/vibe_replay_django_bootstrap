@@ -14,7 +14,7 @@ class Artist(models.Model):  # Исполнитель
         return self.name
 
     def get_absolute_url(self):
-        return reverse('artists', kwargs={'a_id': self.pk})
+        return reverse('artist', kwargs={'a_id': self.pk})
 
     class Meta:
         verbose_name = 'Артист'
@@ -126,18 +126,32 @@ class Song(models.Model):  # Песня
         verbose_name_plural = 'Песни'
 
     def get_absolute_url(self):
-        return reverse('playlist', kwargs={'pl_id': self.pk})
+        return reverse('song', kwargs={'s_id': self.pk})
 
 
 class Account(models.Model):  # Профиль
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     my_music = models.ManyToManyField(Song, verbose_name='Моя музыка')
+    my_artists = models.ManyToManyField(Artist, verbose_name="Мои исполнители")
     photo = models.ImageField(null=True, blank=True,
                               verbose_name='Картинка пользователя', upload_to='profiles/%Y/%m/%d')
 
     def __str__(self):
-        return 'Профиль для {}'.format(self.user)
+        return '{}'.format(self.user)
 
     class Meta:
         verbose_name = 'Профиль'
         verbose_name_plural = 'Профили'
+
+
+class Comment(models.Model):
+    song = models.ForeignKey(Song, on_delete=models.CASCADE, verbose_name="Песня",
+                             blank=True, null=True, related_name="comments_songs")
+    author = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name="Автор коммента",blank=True, null=True)
+    create_date = models.DateTimeField(auto_now=True)
+    text = models.TextField(verbose_name="Текст коммента")
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+

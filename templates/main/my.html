@@ -3,12 +3,23 @@
 {% load main_tags %}
 <div class="main">
     {% if request.user.is_authenticated %}
-    <h1>{{ title }} {{ request.user.username }} | <a class="a-logout" href="{% url 'logout' %}" style="color: black">Выйти</a></h1>
+    <div class="my-info">
+    <h1>{{ title }} {{ request.user.username }}  </h1>
+        <button type="button" class="btn btn-secondary a-logout" onclick="window.location.href = '{% url 'logout' %}';">
+                <ya-tr-span data-index="23-1" data-translated="true"
+                            data-source-lang="en" data-target-lang="ru"
+                            data-value="logout" data-translation="Выйти"
+                            data-ch="1" data-type="trSpan"
+                            data-selected="false">Выйти</ya-tr-span>
+            </button>
         {% else %}
-        <h1>{{ title }}</h1>
+                    <h1>{{ title }}</h1>
+
     {% endif %}
+        </div>
+    <div class="account-main">
     <div class="account-info">
-        <h1>Моя музыка</h1>
+        <h1 style=" display: flex; justify-content: center;">Моя музыка</h1>
         {% if user.account.my_music %}
         {% for m in user.account.my_music.all %}
             <div class="song-body">
@@ -35,6 +46,22 @@
      {% else %}
             <p>Список музыки пуст</p>
     {% endif %}
+    </div>
+    <div class="account-artist-info">
+        <h1 style="    display: flex; justify-content: center;">Мои исполнители</h1>
+        {% if user.account.my_artists %}
+        {% for a in user.account.my_artists.all %}
+        <div class="artists-body">
+        <a class="a-artist" href="{{ a.get_absolute_url }}" style="color: black">
+            <img class="artist_img" src="{{ a.img.url }}" alt="" >
+        <p style="color:white;">{{ a.name }}</p>
+         </a>
+        </div>
+        {% endfor %}
+         {% else %}
+               <p>Список исполнителей пуст</p>
+        {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -35,3 +35,11 @@ def get_artist_by_song_name(song_id):
     song = Song.objects.get(pk=song_id)
     artist = list(Artist.objects.filter(song__pk=song.pk).values())
     return artist[0]['name']
+
+
+@register.simple_tag()
+def get_artist_link(song_id):
+    song = Song.objects.get(pk=song_id)
+    artist = Artist.objects.get(song__pk=song.pk)
+    artist.get_absolute_url()
+    return artist.get_absolute_url()

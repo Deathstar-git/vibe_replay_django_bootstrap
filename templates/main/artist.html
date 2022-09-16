@@ -1,0 +1,68 @@
+{% extends 'main/base.html'%}
+{% load main_tags %}
+{% block content %}
+<div class="main">
+    <div class="artist-album-art" style="background-image: url('{{artist.header_img.url}}');">
+        <div class="artist-info">
+            <img class="artist-cover" src="{{ artist.img.url}}" alt ="">
+            <h3 class="artist-name">{{artist.name}}</h3>
+        </div>
+    </div>
+     <div class="artist-button-bar">
+            <div class="artist-songs"><a class="a-artist" href="{{ artist.get_absolute_url }}">Все песни</a></div>
+         {% if request.user.is_authenticated %}
+            {% if artist in request.user.account.my_artists.all %}
+                 <div class="artist-subscribe-active"><a class="a-follow" href="{% url 'del_to_my_artist' a_id=artist.pk %}">Вы подписаны</a>
+                     <i class="fas fa-solid fa-check" style="color:white"></i>
+                 </div>
+            {% else %}
+             <div class="artist-subscribe"><a class="a-follow" href="{% url 'add_to_my_artist' a_id=artist.pk %}">Подписаться</a></div>
+            {% endif %}
+            {% endif %}
+        </div>
+    <div id="artist-content">
+    <div class="playlist-songs">
+<div class="playlist-body" id="songs_list">
+ {% for s in songs %}
+     <div class="song-body">
+         <div style="display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-right: 270px;">
+     <div class="song_body-img" style="margin-left: 20px;"><img class="song_cover" src="{{ s.icon.url }}" alt =""></div>
+        <div class="song-body-title">
+            <a class="song-link" href="{{ s.get_absolute_url }}"><div class="song-body-item" style="font-weight: bold">{{ s.name }}</div></a>
+            <a class="artist-link" href="{% get_artist_link song_id=s.pk %}"><div class="song-body-item">{% get_artist_by_song_name song_id=s.pk %}</div></a>
+        </div>
+         </div>
+         <div style="display: flex;
+    align-items: center;
+    margin-right: 20px;
+    justify-content: center;;">
+      <div class="song-button" id={{ s.pk }}>
+         <i class="fas fa-play"></i>
+     </div>
+         {% if request.user.is_authenticated %}
+    <div class="song-download">
+         <a href="{% url 'download' song_id=s.pk %}" download>
+          <i class="fas fa-download"></i>
+         </a>
+    </div>
+    <div class="song-like">
+         {% if s in request.user.account.my_music.all %}
+        <a class="song-add-link" style="color:red" href="{% url 'add_to_my' song_id=s.pk %}"></a>
+            {% else %}
+            <a class="song-add-link" href="{% url 'add_to_my' song_id=s.pk %}">
+         {% endif %}
+          <i class="fas fa-heart"></i>
+         </a>
+    </div>
+     {% endif %}
+             </div>
+     </div>
+{% endfor %}
+        </div>
+    </div>
+</div>
+    </div>
+{% endblock %}

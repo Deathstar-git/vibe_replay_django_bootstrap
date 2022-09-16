@@ -1,6 +1,7 @@
 {% extends 'main/base.html'%}
 {% block content %}
 <div class="main">
+<main class="form-signin w-100 m-auto text-center">
     <h1>{{ title }}</h1>
 <div class="form-container">
     <form method="post" action="{% url 'register' %}">
@@ -13,5 +14,6 @@
     <button type="submit" class="login-button">Регистрация</button>
     </form>
 </div>
+</main>
 </div>
 {% endblock %}

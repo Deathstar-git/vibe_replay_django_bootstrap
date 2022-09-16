@@ -18,13 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 
 from djangoProject_repeat import settings
-from main.views import pageNotFound
+from main.views import page_not_found
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls'))
 ]
-handler404 = pageNotFound
+handler404 = page_not_found
+
 if settings.DEBUG:
     # import debug_toolbar
     # urlpatterns = [

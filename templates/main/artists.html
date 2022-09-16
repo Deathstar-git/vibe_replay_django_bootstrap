@@ -6,10 +6,10 @@
 <div class="artists-container">
     {% for a in artists %}
         <div class="artists-body">
-        <!-- <a href="{{ a.get_absolute_url }}" style="color: black"> -->
-        <img class="artist_img" src="{{ a.img.url }}" alt="" >
-        <p>{{ a.name }}</p>
-        <!-- </a> -->
+        <a class="a-artist" href="{{ a.get_absolute_url }}" style="color: black">
+            <img class="artist_img" src="{{ a.img.url }}" alt="" >
+        <p style="color:white;">{{ a.name }}</p>
+         </a>
         </div>
     {% endfor %}
 </div>

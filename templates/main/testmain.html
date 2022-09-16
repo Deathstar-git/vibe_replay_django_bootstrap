@@ -5,21 +5,26 @@
 <div class="main">
 <div id="bg-artwork"></div>
 <div class="main-content">
-    <div class="playlist-container">
-     <h1>Плейлисты</h1>
-    <div class="playlist-listbox" id="playlist_list">
+    <div class="playlist-container container px-4 py-5">
+     <h2 class="pb-2 border-bottom">
+         <ya-tr-span data-index="5-0" data-translated="true"
+                     data-source-lang="en" data-target-lang="ru"
+                     data-value="Hanging icons" data-translation="Рекомендации"
+                     data-ch="0" data-type="trSpan" data-selected="false">
+             Рекомендации</ya-tr-span>
+     </h2>
+    <div class="playlist-listbox row py-5 row-cols-1 row-cols-lg-6" id="playlist_list">
     {% show_playlists curr_id=1 %}
     </div>
 </div>
 <div class="playlist-songs">
-<h1>Песни</h1>
-<div class="playlist-body">
+<div class="playlist-body list-group list-group-checkable d-grid gap-2 border-0 w-auto">
  {% for s in songs %}
-     <div class="song-body">
+     <div class="song-body list-group-item rounded-3 py-3" style="background-color: rgba(255, 255, 255, 0.3);">
      <div class="song_body-img"><img class="song_cover" src="{{ s.icon.url }}"  alt =""></div>
         <div class="song-body-title">
-            <div class="song-body-item" style="font-weight: bold">{{ s.name }}</div>
-            <div class="song-body-item">{% get_artist_by_song_name song_id=s.pk %}</div>
+            <a class="song-link " href="{{ s.get_absolute_url }}"><div class="song-body-item" style="font-weight: bold; color: #444444">{{ s.name }}</div></a>
+            <a class="a-artist" href="{% get_artist_link song_id=s.pk %}"><div class="song-body-item">{% get_artist_by_song_name song_id=s.pk %}</div></a>
         </div>
      <div class="song-button" id={{ s.pk }}>
          <i class="fas fa-play"></i>
@@ -32,7 +37,7 @@
     </div>
     <div class="song-like">
         {% if s in request.user.account.my_music.all %}
-         <a class="song-add-link" style="color:red" href="{% url 'add_to_my' song_id=s.pk %}">
+        <a class="song-add-link" style="color:red" href="{% url 'add_to_my' song_id=s.pk %}"></a>
             {% else %}
             <a class="song-add-link" href="{% url 'add_to_my' song_id=s.pk %}">
          {% endif %}

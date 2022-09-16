@@ -1,6 +1,8 @@
-from django.forms import CharField, TextInput, PasswordInput, EmailInput
+from django.forms import CharField, TextInput, PasswordInput, EmailInput, Textarea
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from django import forms
+from main.models import Comment
 
 
 class RegisterUserForm(UserCreationForm):
@@ -27,3 +29,13 @@ class LoginUserForm(AuthenticationForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'password1', 'password2')
+
+
+class CommentForm(forms.ModelForm):
+    text = CharField(label='Ваш комментарий:',
+                     widget=Textarea(attrs={'class': 'comment-input', 'placeholder': 'Введите комментарий'}))
+
+    class Meta:
+        model = Comment
+        fields = ('text',)
+

@@ -1,8 +1,9 @@
 {% extends 'main/base.html'%}
 {% block content %}
 <div class="main">
+        <main class="form-signin w-100 m-auto text-center">
         <h1>{{ title }}</h1>
-        <h2>Впервые у нас? | <a class="a-register" href="{% url 'register' %}" style="color: black">Регистрация</a></h2>
+        <h2>Впервые у нас? | <a class="a-register" href="{% url 'register' %}">Регистрация</a></h2>
 
     <div class="form-container">
     <form method="post" action="{% url 'login' %}">
@@ -13,6 +14,8 @@
     {% endfor %}
     <button type="submit" class="login-button">Войти</button>
     </form>
+
 </div>
+        </main>
 </div>
 {% endblock %}

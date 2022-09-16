@@ -1,0 +1,53 @@
+{% extends 'main/base.html'%}
+{% load main_tags %}
+{% block content %}
+<div class="main">
+    <div class="song-page">
+        <div class="song-page-info">
+             <div class="song-page-title">
+             <a class="song-link" href="{{ song.get_absolute_url }}"><div class="song-body-item" style="font-weight: bold; font-size: 30px">{{ song.name }}</div></a>
+            <a class="a-artist" href="{% get_artist_link song_id=song.pk %}"><div class="song-body-item" style="font-size: 26px">{% get_artist_by_song_name song_id=song.pk %}</div></a>
+                 <div class="song-page-genre">{{ song.category.get}}</div>
+             </div>
+      <div class="song-button" style='font-size: 40px; margin-top: 50px; 'id={{ song.pk }}>
+         <i class="fas fa-play"></i>
+     </div>
+        </div>
+
+         <div class="songpage-img">
+            <img class="songpage-cover" src="{{ song.icon.url }}" alt ="">
+        </div>
+    </div>
+    {% if request.user.is_authenticated %}
+    <form method="post" id="comment-form" action="{% url 'send_comment' s_id=song.pk %}">
+    {% csrf_token %}
+    {% for f in form %}
+            <div class="comment-form">
+        <p style="display:flex; align-items:center; justify-content: flex-start"><label class="form-label" id="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}</p>
+        <div class="form-error">{{ f.errors }}</div>
+    {% endfor %}
+    <button class="comment-button">Отправить</button>
+                    </div>
+    </form>
+
+    {% endif %}
+    {% if song.comments_songs.all %}
+    <div class="comment-container">
+        {% for c in song.comments_songs.all %}
+        <div class="comment-info">
+        <div class="comment-text">{{ c.text}}</div>
+            <div class="comment-author">
+                <div class="comment-author">{{ c.author}}</div>
+                <div class="comment-date">{{ c.create_date}}</div>
+            </div>
+
+
+        </div>
+    {% endfor %}
+    </div>
+        {% else %}
+        <div style="font-size:20px;padding: 20px;text-align: center;">Комментарии отсутствуют</div>
+    {% endif %}
+
+</div>
+{% endblock %}
